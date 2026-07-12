@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/Hurmuud-school/',
+    base: '/salaama-school/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
