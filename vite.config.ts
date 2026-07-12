@@ -5,7 +5,6 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/salaama-school/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
