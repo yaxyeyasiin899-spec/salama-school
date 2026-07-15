@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Menu, Bell, Calendar, FileText, CheckSquare, Edit3, MessageSquare, Home, UserCircle, LogOut, Clock, Activity, BookOpen } from 'lucide-react';
 import { User, Student } from '../types';
 
-export default function StudentDashboard({ user, onLogout, students, attendance, grades }: { user: User, onLogout: () => void, students: Student[], attendance?: Record<number, string>, grades?: Record<number, Record<string, number>> }) {
+export default function StudentDashboard({ user, onLogout, students, attendance, grades, subjects }: { user: User, onLogout: () => void, students: Student[], attendance?: Record<number, string>, grades?: Record<number, Record<string, number>>, subjects: string[] }) {
   const [activeTab, setActiveTab] = useState('home');
   const studentData = students.find(s => s.username === user.username);
   const className = studentData?.className || 'Fasalka';
@@ -186,24 +186,16 @@ export default function StudentDashboard({ user, onLogout, students, attendance,
 
             {activeTab === 'maadooyinka' && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">7-da Maado Ee Lagu Barto</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">{subjects.length}-da Maado Ee Lagu Barto</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { name: 'Tarbiya', color: 'text-green-500', bg: 'bg-green-50' },
-                    { name: 'Carabi', color: 'text-emerald-500', bg: 'bg-emerald-50' },
-                    { name: 'Soomaali', color: 'text-blue-500', bg: 'bg-blue-50' },
-                    { name: 'Xisaab', color: 'text-indigo-500', bg: 'bg-indigo-50' },
-                    { name: 'English', color: 'text-purple-500', bg: 'bg-purple-50' },
-                    { name: 'Cilmi Bulsho', color: 'text-orange-500', bg: 'bg-orange-50' },
-                    { name: 'Saynis', color: 'text-teal-500', bg: 'bg-teal-50' }
-                  ].map((maado, index) => (
+                  {subjects.map((subject, index) => (
                     <div key={index} className="flex justify-between items-center border border-gray-100 p-4 rounded-xl hover:bg-gray-50 transition-colors">
                       <div className="flex items-center gap-4">
-                        <div className={`${maado.bg} p-3 rounded-xl ${maado.color}`}>
+                        <div className="bg-blue-50 p-3 rounded-xl text-blue-500">
                           <BookOpen className="w-6 h-6" />
                         </div>
                         <div>
-                          <div className="font-bold text-gray-800">{maado.name}</div>
+                          <div className="font-bold text-gray-800">{subject}</div>
                           <div className="text-sm text-gray-500">Maado Asasi Ah</div>
                         </div>
                       </div>
@@ -225,19 +217,11 @@ export default function StudentDashboard({ user, onLogout, students, attendance,
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { name: 'Tarbiya' },
-                        { name: 'Carabi' },
-                        { name: 'Soomaali' },
-                        { name: 'Xisaab' },
-                        { name: 'English' },
-                        { name: 'Cilmi Bulsho' },
-                        { name: 'Saynis' }
-                      ].map((maado, index) => {
-                        const score = myGrades[maado.name] || 0;
+                      {subjects.map((subject, index) => {
+                        const score = myGrades[subject] || 0;
                         return (
                           <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <td className="py-3 px-4 font-bold text-gray-800 whitespace-nowrap">{maado.name}</td>
+                            <td className="py-3 px-4 font-bold text-gray-800 whitespace-nowrap">{subject}</td>
                             <td className="py-3 px-4 font-bold text-blue-600 text-right whitespace-nowrap">{score}</td>
                           </tr>
                         );
@@ -247,7 +231,7 @@ export default function StudentDashboard({ user, onLogout, students, attendance,
                       <tr>
                         <td className="py-4 px-4 font-bold text-gray-800">Wadarta Guud</td>
                         <td className="py-4 px-4 font-bold text-green-600 text-right text-lg">
-                           {totalScore} / 700
+                           {totalScore} / {subjects.length * 100}
                         </td>
                       </tr>
                     </tfoot>

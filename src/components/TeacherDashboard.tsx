@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Menu, Bell, BookOpen, Calendar, CheckSquare, Edit3, MessageSquare, Home, UserCircle, LogOut, Clock, FileText } from 'lucide-react';
 import { User, Student, Teacher } from '../types';
 
-export default function TeacherDashboard({ user, onLogout, students, teachers, attendance, setAttendance, grades, setGrades }: { user: User, onLogout: () => void, students: Student[], teachers: Teacher[], attendance: Record<number, string>, setAttendance: (a: Record<number, string>) => void, grades: Record<number, Record<string, number>>, setGrades: (g: Record<number, Record<string, number>>) => void }) {
+export default function TeacherDashboard({ user, onLogout, students, teachers, attendance, setAttendance, grades, setGrades, subjects }: { user: User, onLogout: () => void, students: Student[], teachers: Teacher[], attendance: Record<number, string>, setAttendance: (a: Record<number, string>) => void, grades: Record<number, Record<string, number>>, setGrades: (g: Record<number, Record<string, number>>) => void, subjects: string[] }) {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedClass, setSelectedClass] = useState('Fasalka 2aad');
   const teacherData = teachers.find(t => t.username === user.username);
@@ -69,7 +69,7 @@ export default function TeacherDashboard({ user, onLogout, students, teachers, a
                       <FileText className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
                     <div>
-                      <div className="text-2xl md:text-3xl font-bold text-gray-800">5</div>
+                      <div className="text-2xl md:text-3xl font-bold text-gray-800">{subjects.length}</div>
                       <div className="text-xs md:text-sm text-gray-500">Maadooyinka</div>
                     </div>
                   </div>
@@ -124,6 +124,11 @@ export default function TeacherDashboard({ user, onLogout, students, teachers, a
                     <option value="Fasalka 1aad">Fasalka 1aad</option>
                     <option value="Fasalka 2aad">Fasalka 2aad</option>
                     <option value="Fasalka 3aad">Fasalka 3aad</option>
+                    <option value="Fasalka 4aad">Fasalka 4aad</option>
+                    <option value="Fasalka 5aad">Fasalka 5aad</option>
+                    <option value="Fasalka 6aad">Fasalka 6aad</option>
+                    <option value="Fasalka 7aad">Fasalka 7aad</option>
+                    <option value="Fasalka 8aad">Fasalka 8aad</option>
                   </select>
                 </div>
                 
@@ -198,6 +203,11 @@ export default function TeacherDashboard({ user, onLogout, students, teachers, a
                     <option value="Fasalka 1aad">Fasalka 1aad</option>
                     <option value="Fasalka 2aad">Fasalka 2aad</option>
                     <option value="Fasalka 3aad">Fasalka 3aad</option>
+                    <option value="Fasalka 4aad">Fasalka 4aad</option>
+                    <option value="Fasalka 5aad">Fasalka 5aad</option>
+                    <option value="Fasalka 6aad">Fasalka 6aad</option>
+                    <option value="Fasalka 7aad">Fasalka 7aad</option>
+                    <option value="Fasalka 8aad">Fasalka 8aad</option>
                   </select>
                 </div>
                 

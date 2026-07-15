@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Menu, Bell, UserPlus, Users, BookOpen, Calendar, FileText, DollarSign, Home, UserCircle, LogOut, ArrowLeft, Search } from 'lucide-react';
 import { User, Student, Teacher } from '../types';
 
-export default function AdminDashboard({ user, onLogout, students, setStudents, teachers, setTeachers, attendance, grades }: { user: User, onLogout: () => void, students: Student[], setStudents: (s: Student[]) => void, teachers: Teacher[], setTeachers: (t: Teacher[]) => void, attendance: Record<number, string>, grades: Record<number, Record<string, number>> }) {
+export default function AdminDashboard({ user, onLogout, students, setStudents, teachers, setTeachers, attendance, grades, subjects, setSubjects }: { user: User, onLogout: () => void, students: Student[], setStudents: (s: Student[]) => void, teachers: Teacher[], setTeachers: (t: Teacher[]) => void, attendance: Record<number, string>, grades: Record<number, Record<string, number>>, subjects: string[], setSubjects: (s: string[]) => void }) {
   const [activeTab, setActiveTab] = useState('home');
+  const [newSubject, setNewSubject] = useState('');
 
   const [editingUser, setEditingUser] = useState<{ type: 'student' | 'teacher', id: number } | null>(null);
   
@@ -11,13 +12,26 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
   const [searchStudentClass, setSearchStudentClass] = useState('');
   const [selectedStudentForDetails, setSelectedStudentForDetails] = useState<Student | null>(null);
 
+  const [searchNatiijadaName, setSearchNatiijadaName] = useState('');
+  const [searchedNatiijadaStudent, setSearchedNatiijadaStudent] = useState<Student | null>(null);
+
+  const handleSearchNatiijada = (e: React.FormEvent) => {
+    e.preventDefault();
+    const found = students.find(s => s.name.toLowerCase().trim() === searchNatiijadaName.toLowerCase().trim());
+    setSearchedNatiijadaStudent(found || null);
+    if (!found) {
+      alert("Lama helin arday magacaas leh. Fadlan hubi magaca (oo saddexan).");
+    }
+  };
+
+
   const handleAddStudent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const newStudent = {
       id: students.length + 1,
       name: formData.get('name') as string,
-      className: formData.get('class') as string === '1' ? 'Fasalka 1aad' : formData.get('class') === '2' ? 'Fasalka 2aad' : 'Fasalka 3aad',
+      className: `Fasalka ${formData.get('class')}aad`,
       phone: formData.get('phone') as string,
       username: formData.get('username') as string,
       password: formData.get('password') as string,
@@ -97,7 +111,7 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                       <Users className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
                     <div>
-                      <div className="text-2xl md:text-3xl font-bold text-gray-800">120</div>
+                      <div className="text-2xl md:text-3xl font-bold text-gray-800">{students.length}</div>
                       <div className="text-xs md:text-sm text-gray-500">Ardayda</div>
                     </div>
                   </div>
@@ -106,7 +120,7 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                       <UserPlus className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
                     <div>
-                      <div className="text-2xl md:text-3xl font-bold text-gray-800">15</div>
+                      <div className="text-2xl md:text-3xl font-bold text-gray-800">{teachers.length}</div>
                       <div className="text-xs md:text-sm text-gray-500">Macalimiinta</div>
                     </div>
                   </div>
@@ -119,12 +133,12 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                       <div className="text-xs md:text-sm text-gray-500">Fasallada</div>
                     </div>
                   </div>
-                  <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                  <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('maadooyinka')}>
                     <div className="bg-green-100 p-3 md:p-4 rounded-full text-green-600">
                       <FileText className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
                     <div>
-                      <div className="text-2xl md:text-3xl font-bold text-gray-800">28</div>
+                      <div className="text-2xl md:text-3xl font-bold text-gray-800">{subjects.length}</div>
                       <div className="text-xs md:text-sm text-gray-500">Maadooyinka</div>
                     </div>
                   </div>
@@ -134,13 +148,66 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                 <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4 md:gap-6">
                   <ActionCard icon={<UserPlus />} label="Ku dar Arday" color="text-blue-500" onClick={() => setActiveTab('add_student')} />
                   <ActionCard icon={<Users />} label="Ku dar Macalin" color="text-indigo-500" onClick={() => setActiveTab('add_teacher')} />
-                  <ActionCard icon={<BookOpen />} label="Fasallada" color="text-purple-500" />
+                  <ActionCard icon={<BookOpen />} label="Fasallada" color="text-purple-500" onClick={() => setActiveTab('fasallada')} />
                   <ActionCard icon={<Calendar />} label="Jadwalka" color="text-pink-500" />
-                  <ActionCard icon={<FileText />} label="Natiijooyinka" color="text-green-500" />
+                  <ActionCard icon={<FileText />} label="Natiijooyinka" color="text-green-500" onClick={() => setActiveTab('natiijada')} />
                   <ActionCard icon={<DollarSign />} label="Lacagaha" color="text-yellow-500" />
                   <ActionCard icon={<Bell />} label="Xaadirinta" color="text-teal-500" onClick={() => setActiveTab('xaadirinta')} />
                 </div>
               </>
+            )}
+
+            {activeTab === 'maadooyinka' && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <ArrowLeft className="w-6 h-6 cursor-pointer text-gray-500 hover:text-blue-600" onClick={() => setActiveTab('home')} />
+                  <h2 className="text-xl md:text-2xl font-bold text-gray-800">Maamulka Maadooyinka</h2>
+                </div>
+
+                <div className="mb-8">
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (newSubject.trim() && !subjects.includes(newSubject.trim())) {
+                      setSubjects([...subjects, newSubject.trim()]);
+                      setNewSubject('');
+                    }
+                  }} className="flex gap-4">
+                    <input 
+                      type="text" 
+                      placeholder="Geli magaca maadada cusub..." 
+                      className="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newSubject}
+                      onChange={(e) => setNewSubject(e.target.value)}
+                    />
+                    <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium transition-colors">
+                      Ku Dar Maado
+                    </button>
+                  </form>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {subjects.map((subject, index) => (
+                    <div key={index} className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between hover:shadow-sm transition-shadow">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
+                          <BookOpen className="w-5 h-5" />
+                        </div>
+                        <span className="font-bold text-gray-800">{subject}</span>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          if(confirm(`Ma hubtaa inaad tirtirto maadadan: ${subject}?`)) {
+                            setSubjects(subjects.filter(s => s !== subject));
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium"
+                      >
+                        Tirtir
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {activeTab === 'xaadirinta' && (
@@ -201,6 +268,11 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                       <option value="1">Fasalka 1aad</option>
                       <option value="2">Fasalka 2aad</option>
                       <option value="3">Fasalka 3aad</option>
+                      <option value="4">Fasalka 4aad</option>
+                      <option value="5">Fasalka 5aad</option>
+                      <option value="6">Fasalka 6aad</option>
+                      <option value="7">Fasalka 7aad</option>
+                      <option value="8">Fasalka 8aad</option>
                     </select>
                   </div>
                   <div>
@@ -237,10 +309,9 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                     <label className="block text-sm font-medium text-gray-700 mb-1">Maadada uu dhigayo</label>
                     <select name="subject" className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
                       <option value="">Dooro Maadada</option>
-                      <option value="Mathematics">Mathematics</option>
-                      <option value="Science">Science</option>
-                      <option value="English">English</option>
-                      <option value="Somali">Somali</option>
+                      {subjects.map((subject, index) => (
+                        <option key={index} value={subject}>{subject}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -310,19 +381,11 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                           </tr>
                         </thead>
                         <tbody>
-                          {[
-                            { name: 'Tarbiya' },
-                            { name: 'Carabi' },
-                            { name: 'Soomaali' },
-                            { name: 'Xisaab' },
-                            { name: 'English' },
-                            { name: 'Cilmi Bulsho' },
-                            { name: 'Saynis' }
-                          ].map((maado, index) => {
-                            const score = grades[selectedStudentForDetails.id]?.[maado.name] || 0;
+                          {subjects.map((subject, index) => {
+                            const score = grades[selectedStudentForDetails.id]?.[subject] || 0;
                             return (
                               <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                <td className="py-3 px-4 font-bold text-gray-800">{maado.name}</td>
+                                <td className="py-3 px-4 font-bold text-gray-800">{subject}</td>
                                 <td className="py-3 px-4 font-bold text-blue-600 text-right">{score}</td>
                               </tr>
                             );
@@ -332,7 +395,7 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                           <tr>
                             <td className="py-4 px-4 font-bold text-gray-800">Wadarta Guud</td>
                             <td className="py-4 px-4 font-bold text-green-600 text-right text-lg">
-                              {Object.values(grades[selectedStudentForDetails.id] || {}).reduce((a, b) => a + b, 0)} / 700
+                              {Object.values(grades[selectedStudentForDetails.id] || {}).reduce((a, b) => a + b, 0)} / {subjects.length * 100}
                             </td>
                           </tr>
                         </tfoot>
@@ -370,6 +433,11 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                         <option value="Fasalka 1aad">Fasalka 1aad</option>
                         <option value="Fasalka 2aad">Fasalka 2aad</option>
                         <option value="Fasalka 3aad">Fasalka 3aad</option>
+                        <option value="Fasalka 4aad">Fasalka 4aad</option>
+                        <option value="Fasalka 5aad">Fasalka 5aad</option>
+                        <option value="Fasalka 6aad">Fasalka 6aad</option>
+                        <option value="Fasalka 7aad">Fasalka 7aad</option>
+                        <option value="Fasalka 8aad">Fasalka 8aad</option>
                       </select>
                     </div>
 
@@ -392,6 +460,11 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                               <td className="py-3 px-4 text-right flex items-center justify-end gap-3">
                                 <button onClick={() => setSelectedStudentForDetails(student)} className="text-green-600 hover:text-green-800 text-sm font-medium">Xogta</button>
                                 <button onClick={() => setEditingUser({ type: 'student', id: student.id })} className="text-blue-600 hover:text-blue-800 text-sm font-medium">Password</button>
+                                <button onClick={() => {
+                                  if(confirm(`Ma hubtaa inaad tirtirto ardayga: ${student.name}?`)) {
+                                    setStudents(students.filter(s => s.id !== student.id));
+                                  }
+                                }} className="text-red-500 hover:text-red-700 text-sm font-medium">Tirtir</button>
                               </td>
                             </tr>
                           ))}
@@ -434,8 +507,13 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
                           <td className="py-3 px-4 text-gray-600 whitespace-nowrap">{teacher.subject}</td>
                           <td className="py-3 px-4 text-gray-600 whitespace-nowrap">{teacher.phone || '-'}</td>
                           <td className="py-3 px-4 text-gray-600 whitespace-nowrap">{teacher.username}</td>
-                          <td className="py-3 px-4 text-right">
+                          <td className="py-3 px-4 text-right flex items-center justify-end gap-3">
                             <button onClick={() => setEditingUser({ type: 'teacher', id: teacher.id })} className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Bedel Password</button>
+                            <button onClick={() => {
+                              if(confirm(`Ma hubtaa inaad tirtirto macalinka: ${teacher.name}?`)) {
+                                setTeachers(teachers.filter(t => t.id !== teacher.id));
+                              }
+                            }} className="text-red-500 hover:text-red-700 text-sm font-medium">Tirtir</button>
                           </td>
                         </tr>
                       ))}
@@ -451,6 +529,127 @@ export default function AdminDashboard({ user, onLogout, students, setStudents, 
             )}
           </div>
         </div>
+
+        
+            {activeTab === 'natiijada' && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">Raadi Natiijada Ardayga</h2>
+                
+                <form onSubmit={handleSearchNatiijada} className="flex gap-3 mb-8">
+                  <div className="flex-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Search className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      className="block w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      placeholder="Geli magaca ardayga oo saddexan..."
+                      value={searchNatiijadaName}
+                      onChange={(e) => setSearchNatiijadaName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+                    Raadi
+                  </button>
+                </form>
+
+                {searchedNatiijadaStudent && (
+                  <div className="mt-6 border-t border-gray-100 pt-6">
+                    <div className="bg-blue-50 rounded-xl p-6 border border-blue-100 mb-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-blue-600/80 mb-1">Magaca Buuxa</p>
+                          <p className="font-bold text-blue-900 text-lg">{searchedNatiijadaStudent.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-blue-600/80 mb-1">Fasalka</p>
+                          <p className="font-bold text-blue-900 text-lg">{searchedNatiijadaStudent.className}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-blue-600/80 mb-1">Telefoonka</p>
+                          <p className="font-bold text-blue-900 text-lg">{searchedNatiijadaStudent.phone || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-blue-600/80 mb-1">Username (ID)</p>
+                          <p className="font-bold text-blue-900 text-lg">{searchedNatiijadaStudent.username}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">Maqnaashaha (Xaadirinta Maanta)</h3>
+                    <div className="bg-white border border-gray-100 rounded-xl p-4 mb-6">
+                      {attendance[searchedNatiijadaStudent.id] === 'xaadir' && <span className="text-green-600 bg-green-50 px-4 py-2 rounded-full font-bold text-sm">Xaadir</span>}
+                      {attendance[searchedNatiijadaStudent.id] === 'maqan' && <span className="text-red-600 bg-red-50 px-4 py-2 rounded-full font-bold text-sm">Waa Maqan</span>}
+                      {attendance[searchedNatiijadaStudent.id] === 'fasax' && <span className="text-yellow-600 bg-yellow-50 px-4 py-2 rounded-full font-bold text-sm">Fasax</span>}
+                      {!attendance[searchedNatiijadaStudent.id] && <span className="text-gray-500 font-medium text-sm">Wali lama xaadirin maanta</span>}
+                    </div>
+
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">Natiijada Buundooyinka</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse min-w-full">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="py-3 px-4 text-sm font-medium text-gray-500">Maadada</th>
+                            <th className="py-3 px-4 text-sm font-medium text-gray-500 text-right">Buundada</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subjects.map((subject, index) => {
+                            const score = grades[searchedNatiijadaStudent.id]?.[subject] || 0;
+                            return (
+                              <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                <td className="py-3 px-4 font-bold text-gray-800">{subject}</td>
+                                <td className="py-3 px-4 font-bold text-blue-600 text-right">{score}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                        <tfoot className="bg-gray-50">
+                          <tr>
+                            <td className="py-4 px-4 font-bold text-gray-800">Wadarta Guud</td>
+                            <td className="py-4 px-4 font-bold text-green-600 text-right text-lg">
+                              {Object.values(grades[searchedNatiijadaStudent.id] || {}).reduce((a, b) => a + b, 0)} / {subjects.length * 100}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+        
+            {activeTab === 'fasallada' && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">Fasallada & Tirada Ardayda</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {['Fasalka 1aad', 'Fasalka 2aad', 'Fasalka 3aad', 'Fasalka 4aad', 'Fasalka 5aad', 'Fasalka 6aad', 'Fasalka 7aad', 'Fasalka 8aad'].map(className => {
+                    const studentCount = students.filter(s => s.className === className).length;
+                    if (studentCount === 0 && !students.some(s => s.className.includes(className))) return null;
+                    return (
+                      <div key={className} className="bg-purple-50 border border-purple-100 rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition-shadow">
+                        <BookOpen className="w-10 h-10 text-purple-500 mb-3" />
+                        <h3 className="text-lg font-bold text-gray-800 mb-1">{className}</h3>
+                        <p className="text-purple-600 font-medium text-2xl">{studentCount} <span className="text-sm text-purple-500 font-normal">Arday</span></p>
+                      </div>
+                    );
+                  })}
+                  
+                  {Array.from(new Set(students.map(s => s.className))).filter(c => !['Fasalka 1aad', 'Fasalka 2aad', 'Fasalka 3aad', 'Fasalka 4aad', 'Fasalka 5aad', 'Fasalka 6aad', 'Fasalka 7aad', 'Fasalka 8aad'].includes(c)).map(className => {
+                    const studentCount = students.filter(s => s.className === className).length;
+                    return (
+                      <div key={className} className="bg-purple-50 border border-purple-100 rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition-shadow">
+                        <BookOpen className="w-10 h-10 text-purple-500 mb-3" />
+                        <h3 className="text-lg font-bold text-gray-800 mb-1">{className}</h3>
+                        <p className="text-purple-600 font-medium text-2xl">{studentCount} <span className="text-sm text-purple-500 font-normal">Arday</span></p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
         {editingUser && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
